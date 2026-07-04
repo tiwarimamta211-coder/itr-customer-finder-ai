@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ITR Customer Finder AI | IncomeAIHub</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --bg2: #10141e;
+    --bg3: #161b28;
+    --card: #1a2032;
+    --card2: #202538;
+    --border: #28304a;
+    --gold: #f5a623;
+    --gold-dim: #f5a62325;
+    --emerald: #00d4aa;
+    --emerald-dim: #00d4aa22;
+    --saffron: #ff6b2b;
+    --saffron-dim: #ff6b2b22;
+    --blue: #4da6ff;
+    --blue-dim: #4da6ff20;
+    --text: #e8edf5;
+    --text2: #8892b0;
+    --text3: #4a5270;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; line-height: 1.6; }
+
+  /* AD SLOTS */
+  .ad-banner { background: var(--bg2); border-bottom: 1px solid var(--border); text-align: center; padding: 8px; }
+  .ad-slot { background: var(--bg3); border: 1px dashed var(--border); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; color: var(--text3); font-size: 11px; font-family: 'DM Mono', monospace; }
+
+  /* HEADER */
+  header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--saffron), var(--gold)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .logo-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; }
+  .logo-text span { color: var(--gold); }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .badge { background: var(--saffron-dim); border: 1px solid var(--saffron); color: var(--saffron); font-size: 11px; font-family: 'DM Mono', monospace; padding: 4px 10px; border-radius: 20px; }
+
+  /* HERO */
+  .hero { padding: 50px 24px 36px; text-align: center; max-width: 680px; margin: 0 auto; }
+  .hero-eyebrow { display: inline-flex; align-items: center; gap: 6px; background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold); font-size: 11px; font-family: 'DM Mono', monospace; padding: 5px 14px; border-radius: 20px; margin-bottom: 18px; letter-spacing: 0.08em; }
+  .hero h1 { font-family: 'Syne', sans-serif; font-size: clamp(26px, 5vw, 44px); font-weight: 800; line-height: 1.15; margin-bottom: 14px; }
+  .hero h1 .grad { background: linear-gradient(90deg, var(--saffron), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .hero p { color: var(--text2); font-size: 15px; max-width: 480px; margin: 0 auto 28px; }
+  .stats-row { display: flex; justify-content: center; gap: 28px; flex-wrap: wrap; }
+  .stat { text-align: center; }
+  .stat-val { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--gold); }
+  .stat-lbl { font-size: 11px; color: var(--text3); }
+
+  /* SEASON BANNER */
+  .season-banner { max-width: 1180px; margin: 0 auto 20px; padding: 0 20px; }
+  .season-alert { background: linear-gradient(135deg, var(--saffron-dim), var(--gold-dim)); border: 1px solid var(--saffron); border-radius: var(--radius); padding: 14px 20px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .season-icon { font-size: 24px; flex-shrink: 0; }
+  .season-text { flex: 1; }
+  .season-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; color: var(--gold); margin-bottom: 2px; }
+  .season-desc { font-size: 12px; color: var(--text2); }
+  .season-days { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--saffron); font-weight: 500; background: var(--saffron-dim); border: 1px solid var(--saffron); padding: 6px 14px; border-radius: 20px; flex-shrink: 0; }
+
+  /* MAIN */
+  .main { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; display: grid; grid-template-columns: 350px 1fr; gap: 22px; align-items: start; }
+
+  /* PANEL */
+  .panel { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .panel-head { background: var(--card2); padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .panel-head-icon { font-size: 16px; }
+  .panel-head-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; }
+  .panel-body { padding: 20px; }
+
+  /* FORM */
+  .form-group { margin-bottom: 16px; }
+  label { display: block; font-size: 11px; font-weight: 600; color: var(--text2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+  input, select, textarea { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 10px 14px; outline: none; transition: border-color 0.2s; }
+  input:focus, select:focus, textarea:focus { border-color: var(--gold); }
+  input::placeholder, textarea::placeholder { color: var(--text3); }
+  select { cursor: pointer; } select option { background: var(--bg3); }
+  textarea { resize: vertical; min-height: 72px; }
+
+  /* CHECKBOX GRID */
+  .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+  .check-item { display: flex; align-items: center; gap: 7px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px; cursor: pointer; transition: all 0.2s; user-select: none; font-size: 13px; }
+  .check-item:hover { border-color: var(--text3); }
+  .check-item.on { border-color: var(--emerald); background: var(--emerald-dim); color: var(--emerald); }
+  .check-item input { display: none; }
+
+  /* SLIDER */
+  .slider-row { display: flex; align-items: center; gap: 10px; }
+  input[type=range] { flex: 1; padding: 0; -webkit-appearance: none; height: 4px; background: var(--border); border-radius: 2px; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 15px; height: 15px; background: var(--gold); border-radius: 50%; cursor: pointer; }
+  .slider-val { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--gold); min-width: 50px; text-align: right; flex-shrink: 0; }
+
+  /* API KEY */
+  .api-box { position: relative; }
+  .api-box input { padding-right: 42px; }
+  .eye-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 15px; color: var(--text2); line-height: 1; padding: 4px; }
+  .api-status { font-size: 11px; margin-top: 4px; font-family: 'DM Mono', monospace; }
+  .api-note { font-size: 11px; color: var(--text3); margin-top: 3px; }
+
+  /* BUTTONS */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+  .btn-gold { background: linear-gradient(135deg, var(--saffron), var(--gold)); color: #0a0c10; padding: 13px 20px; width: 100%; }
+  .btn-gold:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text2); padding: 8px 14px; }
+  .btn-ghost:hover { border-color: var(--text3); color: var(--text); }
+  .btn-em { background: var(--emerald-dim); border: 1px solid var(--emerald); color: var(--emerald); padding: 8px 14px; }
+  .btn-sm { font-size: 12px; padding: 6px 12px; }
+  .btn-wa { background: #25d366; color: #fff; padding: 8px 14px; }
+  .btn-wa:hover { background: #20b858; }
+
+  /* RESULTS */
+  .results-area { display: flex; flex-direction: column; gap: 18px; }
+
+  /* TABS */
+  .tabs { display: flex; gap: 4px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 5px; }
+  .tab { flex: 1; padding: 9px; text-align: center; font-size: 13px; font-weight: 600; color: var(--text2); border-radius: var(--radius-sm); cursor: pointer; border: none; background: none; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .tab.active { background: var(--card2); color: var(--gold); border: 1px solid var(--border); }
+
+  /* CUSTOMER CARD */
+  .cust-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; transition: all 0.2s; }
+  .cust-card:hover { border-color: var(--gold-dim); transform: translateY(-2px); }
+  .cust-card.saved { border-color: var(--emerald); }
+  .card-top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+  .cust-avatar { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .card-info { flex: 1; }
+  .card-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  .card-meta { display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px; color: var(--text2); align-items: center; }
+  .mbadge { background: var(--bg3); border: 1px solid var(--border); padding: 2px 8px; border-radius: 10px; font-family: 'DM Mono', monospace; font-size: 11px; }
+  .match-score { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 20px; flex-shrink: 0; }
+  .s-high { background: var(--emerald-dim); color: var(--emerald); border: 1px solid var(--emerald); }
+  .s-med { background: var(--gold-dim); color: var(--gold); border: 1px solid var(--gold); }
+  .s-low { background: var(--saffron-dim); color: var(--saffron); border: 1px solid var(--saffron); }
+
+  .card-desc { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 12px; }
+  .card-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
+  .ctag { font-size: 11px; background: var(--blue-dim); border: 1px solid var(--blue); color: var(--blue); padding: 2px 8px; border-radius: 10px; font-family: 'DM Mono', monospace; }
+  .pain-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
+  .pain-tag { font-size: 11px; background: #ff6b2b15; border: 1px solid #ff6b2b40; color: var(--saffron); padding: 2px 8px; border-radius: 10px; }
+
+  .card-actions { display: flex; gap: 7px; flex-wrap: wrap; border-top: 1px solid var(--border); padding-top: 12px; }
+
+  /* FILTER BAR */
+  .filter-bar { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .filter-lbl { font-size: 11px; color: var(--text3); flex-shrink: 0; font-family: 'DM Mono', monospace; }
+  .fbtn { font-size: 12px; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg3); color: var(--text2); cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+  .fbtn.active { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
+  .fsearch { margin-left: auto; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-size: 13px; padding: 6px 12px; outline: none; width: 150px; font-family: 'DM Sans', sans-serif; }
+  .fsearch:focus { border-color: var(--gold); }
+
+  /* INSIGHT BAR */
+  .insight-bar { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .ins-lbl { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; flex-shrink: 0; }
+  .ins-pills { display: flex; gap: 7px; flex-wrap: wrap; flex: 1; }
+  .ins-pill { font-size: 12px; background: var(--bg3); border: 1px solid var(--border); padding: 3px 10px; border-radius: 20px; color: var(--text2); font-family: 'DM Mono', monospace; }
+  .ins-pill.g { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
+  .ins-pill.e { border-color: var(--emerald); color: var(--emerald); background: var(--emerald-dim); }
+
+  /* LOADER */
+  .loader { display: none; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 40px; text-align: center; }
+  .loader.on { display: block; }
+  .spinner { width: 44px; height: 44px; border: 3px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 14px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loader-text { font-size: 13px; color: var(--text2); margin-bottom: 14px; }
+  .step-row { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
+  .lstep { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text3); background: var(--bg3); border: 1px solid var(--border); padding: 4px 10px; border-radius: 20px; transition: all 0.3s; }
+  .lstep.active { color: var(--gold); border-color: var(--gold); background: var(--gold-dim); }
+  .lstep.done { color: var(--emerald); border-color: var(--emerald); background: var(--emerald-dim); }
+
+  /* EMPTY */
+  .empty-state { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 56px 24px; text-align: center; }
+  .empty-icon { font-size: 44px; margin-bottom: 14px; }
+  .empty-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 17px; margin-bottom: 8px; }
+  .empty-desc { font-size: 13px; color: var(--text2); }
+
+  /* MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 580px; max-height: 90vh; overflow-y: auto; }
+  .modal-head { background: var(--card2); padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .modal-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; }
+  .modal-close { background: none; border: none; color: var(--text2); font-size: 20px; cursor: pointer; padding: 4px; }
+  .modal-close:hover { color: var(--text); }
+  .modal-body { padding: 20px; }
+
+  .otabs { display: flex; gap: 5px; margin-bottom: 16px; flex-wrap: wrap; }
+  .otab { padding: 7px 12px; font-size: 12px; font-weight: 600; border-radius: var(--radius-sm); cursor: pointer; border: 1px solid var(--border); background: var(--bg3); color: var(--text2); transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+  .otab.active { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
+  .ocontent { display: none; }
+  .ocontent.active { display: block; }
+  .msg-box { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; font-size: 13px; line-height: 1.8; color: var(--text2); min-height: 160px; white-space: pre-wrap; margin-bottom: 10px; }
+  .msg-box.gen { color: var(--text3); font-style: italic; }
+  .tone-row { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  /* ANALYTICS */
+  .an-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 10px; margin-bottom: 18px; }
+  .an-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; text-align: center; }
+  .an-val { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; color: var(--gold); }
+  .an-lbl { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+  .sbars { display: flex; flex-direction: column; gap: 9px; }
+  .sbar-row { display: flex; align-items: center; gap: 10px; }
+  .sbar-name { font-size: 12px; width: 110px; flex-shrink: 0; color: var(--text2); }
+  .sbar-track { flex: 1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .sbar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--saffron), var(--gold)); transition: width 1s ease; }
+  .sbar-pct { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--gold); width: 32px; text-align: right; flex-shrink: 0; }
+
+  /* TOAST */
+  #toast { position: fixed; bottom: 22px; right: 22px; background: var(--card2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 11px 16px; font-size: 13px; color: var(--text); transform: translateY(80px); opacity: 0; transition: all 0.3s; z-index: 300; max-width: 260px; }
+  #toast.show { transform: translateY(0); opacity: 1; }
+  #toast.success { border-left: 3px solid var(--emerald); }
+  #toast.error { border-left: 3px solid var(--saffron); }
+
+  /* WHATSAPP TEMPLATES */
+  .wa-templates { display: flex; flex-direction: column; gap: 10px; }
+  .wa-tmpl { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; }
+  .wa-tmpl-title { font-size: 12px; font-weight: 600; color: var(--gold); margin-bottom: 8px; font-family: 'Syne', sans-serif; }
+  .wa-tmpl-body { font-size: 13px; color: var(--text2); line-height: 1.7; white-space: pre-wrap; margin-bottom: 10px; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-up { animation: fadeUp 0.35s ease forwards; }
+
+  ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: var(--bg2); } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media (max-width: 860px) { .main { grid-template-columns: 1fr; } }
+  @media (max-width: 480px) { .check-grid { grid-template-columns: 1fr; } .an-grid { grid-template-columns: repeat(2,1fr); } .otabs { flex-wrap: wrap; } .fsearch { width: 100%; } header { padding: 12px 14px; } }
+</style>
+</head>
+<body>
+
+<!-- Ad Banner -->
+<div class="ad-banner">
+  <div class="ad-slot" style="height:48px; max-width:728px; margin:0 auto;">
+    <!-- AdSense: ca-pub-XXXXXXXXXXXXXXXX | leaderboard 728x90 --> 📢 Advertisement
+  </div>
+</div>
+
+<!-- Header -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">📋</div>
+    <div class="logo-text">Income<span>AIHub</span></div>
+  </div>
+  <div class="header-right">
+    <span class="badge">🇮🇳 ITR SEASON</span>
+    <button class="btn btn-ghost btn-sm" onclick="showSaved()">🔖 Saved (<span id="saved-count">0</span>)</button>
+  </div>
+</header>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-eyebrow">🤖 AI POWERED · ITR CUSTOMER FINDER</div>
+  <h1>ITR Filing ke <span class="grad">Customers Dhundho</span></h1>
+  <p>AI aapke area aur expertise ke hisaab se best ITR filing customers dhundta hai — ready-made WhatsApp, Email aur pitch bhi deta hai.</p>
+  <div class="stats-row">
+    <div class="stat"><div class="stat-val">31 Jul</div><div class="stat-lbl">Filing Deadline</div></div>
+    <div class="stat"><div class="stat-val">8Cr+</div><div class="stat-lbl">ITR Filers India</div></div>
+    <div class="stat"><div class="stat-val">₹500+</div><div class="stat-lbl">Per Filing</div></div>
+    <div class="stat"><div class="stat-val">Free</div><div class="stat-lbl">Tool Use</div></div>
+  </div>
+</div>
+
+<!-- Season Banner -->
+<div class="season-banner">
+  <div class="season-alert">
+    <div class="season-icon">🔥</div>
+    <div class="season-text">
+      <div class="season-title">ITR Filing Season Chal Raha Hai!</div>
+      <div class="season-desc">April se July — sabse zyada customers milte hain. Abhi outreach shuru karo!</div>
+    </div>
+    <div class="season-days" id="deadline-counter">Loading…</div>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- LEFT FORM -->
+  <div style="display:flex;flex-direction:column;gap:16px;">
+    <div class="panel">
+      <div class="panel-head"><span class="panel-head-icon">👤</span><span class="panel-head-title">Aapka Profile</span></div>
+      <div class="panel-body">
+
+        <div class="form-group">
+          <label>Aapka Naam / CA Firm</label>
+          <input type="text" id="ca-name" placeholder="e.g. Mamta Sharma / M.Dev Tax Services" value="M.Dev Tax Services">
+        </div>
+
+        <div class="form-group">
+          <label>Sheher / Location</label>
+          <input type="text" id="location" placeholder="e.g. Raipur, Chhattisgarh" value="Raipur, Chhattisgarh">
+        </div>
+
+        <div class="form-group">
+          <label>Aap Kiske Liye File Karte Hain (Customer Type)</label>
+          <div class="check-grid" id="ctype-grid">
+            <label class="check-item on" onclick="toggleCheck(this)"><input type="checkbox" checked>💼 Salaried</label>
+            <label class="check-item on" onclick="toggleCheck(this)"><input type="checkbox" checked>💻 Freelancers</label>
+            <label class="check-item on" onclick="toggleCheck(this)"><input type="checkbox" checked>🏪 Business/Shop</label>
+            <label class="check-item on" onclick="toggleCheck(this)"><input type="checkbox" checked>🏭 MSME</label>
+            <label class="check-item" onclick="toggleCheck(this)"><input type="checkbox">🌍 NRI</label>
+            <label class="check-item" onclick="toggleCheck(this)"><input type="checkbox">👴 Senior Citizen</label>
+            <label class="check-item" onclick="toggleCheck(this)"><input type="checkbox">🏠 Property Owner</label>
+            <label class="check-item" onclick="toggleCheck(this)"><input type="checkbox">📈 Investor/Trader</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Aap Kya Services Dete Hain</label>
+          <div class="check-grid" id="svc-grid">
+            <label class="check-item on" onclick="toggleCheck(this)"><input type="checkbox" checked>📋 ITR Filing</label>
+            <label class="check-item on" onclick="toggleCheck(this)"><input type="checkbox" checked>💰 Tax Planning</label>
+            <label class="check-item" onclick="toggleCheck(this)"><input type="checkbox">📊 GST Return</label>
+            <label class="check-item" onclick="toggleCheck(this)"><input type="checkbox">🧾 TDS Filing</label>
+            <label class="check-item" onclick="toggleCheck(this)"><input type="checkbox">🏦 Audit</label>
+            <label class="check-item" onclick="toggleCheck(this)"><input type="checkbox">📝 Bookkeeping</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Filing Charge (per ITR)</label>
+          <div class="slider-row">
+            <input type="range" id="charge-slider" min="200" max="10000" step="100" value="800"
+              oninput="document.getElementById('charge-val').textContent='₹'+Number(this.value).toLocaleString('en-IN')">
+            <span class="slider-val" id="charge-val">₹800</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Experience</label>
+          <select id="exp">
+            <option value="naya">🌱 Naya hun (0-1 saal)</option>
+            <option value="thoda" selected>⚡ Thoda experience (1-3 saal)</option>
+            <option value="expert">🏆 Expert (3+ saal)</option>
+            <option value="ca">🎓 Qualified CA/CPA</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Outreach Channel</label>
+          <div class="check-grid" id="channel-grid">
+            <label class="check-item on" onclick="toggleCheck(this)"><input type="checkbox" checked>💬 WhatsApp</label>
+            <label class="check-item on" onclick="toggleCheck(this)"><input type="checkbox" checked>📧 Email</label>
+            <label class="check-item" onclick="toggleCheck(this)"><input type="checkbox">💼 LinkedIn</label>
+            <label class="check-item" onclick="toggleCheck(this)"><input type="checkbox">📱 Instagram</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Kuch Special Baatein (optional)</label>
+          <textarea id="special" placeholder="e.g. Hindi mein help karta hun, home visit karta hun, same day filing karta hun…"></textarea>
+        </div>
+
+        <!-- API KEY -->
+        <div class="form-group">
+          <label style="display:flex;align-items:center;justify-content:space-between;">
+            <span>🔑 Anthropic API Key</span>
+            <a href="https://console.anthropic.com" target="_blank" style="font-size:11px;color:var(--gold);text-decoration:none;font-weight:400;text-transform:none;letter-spacing:0;">Free key lein →</a>
+          </label>
+          <div class="api-box">
+            <input type="password" id="api-key" placeholder="sk-ant-api03-…" oninput="saveKey(this.value)">
+            <button class="eye-btn" id="eye-btn" onclick="toggleEye()">👁️</button>
+          </div>
+          <div class="api-status" id="api-status"></div>
+          <div class="api-note">🔒 Key sirf aapke browser mein rahegi — safe hai.</div>
+        </div>
+
+        <button class="btn btn-gold" onclick="findCustomers()">
+          🔍 ITR Customers Dhundho AI Se
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Ad -->
+    <div class="ad-slot" style="height:260px;">
+      <!-- AdSense: ca-pub-XXXXXXXXXXXXXXXX | 300x250 --> 📢 Advertisement
+    </div>
+  </div>
+
+  <!-- RIGHT RESULTS -->
+  <div class="results-area" id="results-area">
+
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon">📋</div>
+      <div class="empty-title">Customers dhundhne ke liye taiyaar</div>
+      <div class="empty-desc">Baayein taraf profile bharo aur <strong>Customers Dhundho</strong> dabao.</div>
+    </div>
+
+    <div class="loader" id="loader">
+      <div class="spinner"></div>
+      <div class="loader-text">AI aapke liye ITR customers dhundh raha hai…</div>
+      <div class="step-row">
+        <span class="lstep" id="s1">🔍 Scanning</span>
+        <span class="lstep" id="s2">🧠 Matching</span>
+        <span class="lstep" id="s3">📊 Scoring</span>
+        <span class="lstep" id="s4">✉️ Messages</span>
+        <span class="lstep" id="s5">✅ Done</span>
+      </div>
+    </div>
+
+    <div id="results-content" style="display:none;flex-direction:column;gap:16px;">
+
+      <div class="insight-bar" id="insight-bar"></div>
+
+      <div class="filter-bar">
+        <span class="filter-lbl">FILTER:</span>
+        <button class="fbtn active" onclick="doFilter('all',this)">Sab</button>
+        <button class="fbtn" onclick="doFilter('high',this)">⚡ Best Match</button>
+        <button class="fbtn" onclick="doFilter('salaried',this)">💼 Salaried</button>
+        <button class="fbtn" onclick="doFilter('business',this)">🏪 Business</button>
+        <button class="fbtn" onclick="doFilter('nri',this)">🌍 NRI</button>
+        <input class="fsearch" type="text" placeholder="🔎 Search…" oninput="doSearch(this.value)">
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('customers',this)">👥 Customers</button>
+        <button class="tab" onclick="switchTab('whatsapp',this)">💬 WA Templates</button>
+        <button class="tab" onclick="switchTab('analytics',this)">📊 Analytics</button>
+        <button class="tab" onclick="switchTab('saved',this)">🔖 Saved</button>
+      </div>
+
+      <!-- Customers Tab -->
+      <div id="tab-customers">
+        <div id="cust-cards" style="display:flex;flex-direction:column;gap:12px;"></div>
+      </div>
+
+      <!-- WhatsApp Tab -->
+      <div id="tab-whatsapp" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><span class="panel-head-icon">💬</span><span class="panel-head-title">Ready-made WhatsApp Templates</span></div>
+          <div class="panel-body">
+            <div style="font-size:12px;color:var(--text2);margin-bottom:14px;">Copy karo aur seedha WhatsApp mein paste karo 👇</div>
+            <div class="wa-templates" id="wa-templates"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analytics Tab -->
+      <div id="tab-analytics" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><span class="panel-head-icon">📊</span><span class="panel-head-title">Customer Match Analytics</span></div>
+          <div class="panel-body">
+            <div class="an-grid" id="an-grid"></div>
+            <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">Customer Type Breakdown</div>
+            <div class="sbars" id="sbars"></div>
+          </div>
+        </div>
+        <div class="ad-slot" style="height:90px;margin-top:14px;">📢 Advertisement</div>
+      </div>
+
+      <!-- Saved Tab -->
+      <div id="tab-saved" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><span class="panel-head-icon">🔖</span><span class="panel-head-title">Saved Customers</span></div>
+          <div class="panel-body">
+            <div id="saved-cards">
+              <div class="empty-state" style="padding:36px;border:none;">
+                <div class="empty-icon">📋</div>
+                <div class="empty-title">Koi saved nahi</div>
+                <div class="empty-desc">Kisi bhi customer par 🔖 dabao.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- OUTREACH MODAL -->
+<div class="modal-overlay" id="outreach-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">✉️ AI Outreach Generator</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="modal-cust-info" style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"></div>
+      <div class="otabs">
+        <button class="otab active" onclick="switchO('whatsapp',this)">💬 WhatsApp</button>
+        <button class="otab" onclick="switchO('email',this)">📧 Email</button>
+        <button class="otab" onclick="switchO('linkedin',this)">💼 LinkedIn</button>
+        <button class="otab" onclick="switchO('sms',this)">📱 SMS</button>
+      </div>
+      <div class="ocontent active" id="oc-whatsapp">
+        <div class="msg-box gen" id="msg-whatsapp">Generating…</div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;">
+          <button class="btn btn-wa btn-sm" onclick="copyMsg('msg-whatsapp')">📋 Copy</button>
+          <button class="btn btn-ghost btn-sm" onclick="regenMsg('whatsapp')">🔄 Naya</button>
+        </div>
+      </div>
+      <div class="ocontent" id="oc-email">
+        <div class="msg-box gen" id="msg-email">Generating…</div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;">
+          <button class="btn btn-em btn-sm" onclick="copyMsg('msg-email')">📋 Copy</button>
+          <button class="btn btn-ghost btn-sm" onclick="regenMsg('email')">🔄 Naya</button>
+          <button class="btn btn-ghost btn-sm" onclick="dlMsg('email')">⬇️ Download</button>
+        </div>
+      </div>
+      <div class="ocontent" id="oc-linkedin">
+        <div class="msg-box gen" id="msg-linkedin">Generating…</div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;">
+          <button class="btn btn-em btn-sm" onclick="copyMsg('msg-linkedin')">📋 Copy</button>
+          <button class="btn btn-ghost btn-sm" onclick="regenMsg('linkedin')">🔄 Naya</button>
+        </div>
+      </div>
+      <div class="ocontent" id="oc-sms">
+        <div class="msg-box gen" id="msg-sms">Generating…</div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;">
+          <button class="btn btn-em btn-sm" onclick="copyMsg('msg-sms')">📋 Copy</button>
+          <button class="btn btn-ghost btn-sm" onclick="regenMsg('sms')">🔄 Naya</button>
+        </div>
+      </div>
+      <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px;">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;">Tone / Bhasha</div>
+        <div class="tone-row">
+          <button class="fbtn active" onclick="setTone('hindi-friendly',this)">🙏 Hindi Friendly</button>
+          <button class="fbtn" onclick="setTone('professional',this)">🤝 Professional</button>
+          <button class="fbtn" onclick="setTone('hinglish',this)">😊 Hinglish</button>
+          <button class="fbtn" onclick="setTone('urgent',this)">⚡ Urgent</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── DEADLINE COUNTER ──
+(function() {
+  const deadline = new Date(new Date().getFullYear(), 6, 31); // July 31
+  const now = new Date();
+  const diff = Math.ceil((deadline - now) / (1000*60*60*24));
+  document.getElementById('deadline-counter').textContent = diff > 0 ? `⏳ ${diff} din baaki` : '🔴 Deadline gayi!';
+})();
+
+// ── API KEY ──
+function getKey() { return localStorage.getItem('itr_api_key') || ''; }
+function saveKey(v) {
+  v = v.trim();
+  localStorage.setItem('itr_api_key', v);
+  const s = document.getElementById('api-status');
+  if (!v) { s.textContent = ''; return; }
+  if (v.startsWith('sk-ant-')) { s.textContent = '✅ Key ready!'; s.style.color = 'var(--emerald)'; }
+  else { s.textContent = '⚠️ "sk-ant-" se shuru honi chahiye'; s.style.color = 'var(--gold)'; }
+}
+function toggleEye() {
+  const i = document.getElementById('api-key');
+  const b = document.getElementById('eye-btn');
+  i.type = i.type === 'password' ? 'text' : 'password';
+  b.textContent = i.type === 'password' ? '👁️' : '🙈';
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const k = getKey();
+  if (k) { document.getElementById('api-key').value = k; saveKey(k); }
+});
+
+// ── FORM HELPERS ──
+function toggleCheck(el) { el.classList.toggle('on'); }
+function getChecked(gridId) {
+  return [...document.querySelectorAll(`#${gridId} .check-item.on`)].map(e => e.textContent.trim());
+}
+
+// ── STATE ──
+let allCustomers = [];
+let savedCustomers = [];
+let currentCustomer = null;
+let currentTone = 'hindi-friendly';
+
+// ── FIND CUSTOMERS ──
+async function findCustomers() {
+  const name = document.getElementById('ca-name').value || 'Tax Service';
+  const location = document.getElementById('location').value || 'India';
+  const charge = document.getElementById('charge-slider').value;
+  const exp = document.getElementById('exp').value;
+  const special = document.getElementById('special').value;
+  const custTypes = getChecked('ctype-grid');
+  const services = getChecked('svc-grid');
+
+  const key = getKey();
+  if (!key) { showToast('⚠️ Pehle API key daalen!', 'error'); document.getElementById('api-key').focus(); return; }
+  if (!custTypes.length) { showToast('Kam se kam ek customer type chuniye', 'error'); return; }
+
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('loader').classList.add('on');
+  document.getElementById('results-content').style.display = 'none';
+
+  const steps = ['s1','s2','s3','s4','s5'];
+  let si = 0;
+  const iv = setInterval(() => {
+    if (si > 0) document.getElementById(steps[si-1]).classList.replace('active','done');
+    if (si < steps.length) { document.getElementById(steps[si]).classList.add('active'); si++; }
+    else clearInterval(iv);
+  }, 900);
+
+  const prompt = `You are an ITR Customer Finder AI for Indian tax professionals. Generate exactly 8 realistic potential ITR filing customers for:
+CA/Tax Professional: ${name}
+Location: ${location}
+Experience: ${exp}
+Services: ${services.join(', ')}
+Customer Types Wanted: ${custTypes.join(', ')}
+Filing Charge: ₹${Number(charge).toLocaleString('en-IN')} per ITR
+Special: ${special || 'None'}
+
+Return a JSON array of 8 customer objects. Each must have:
+- id: number
+- name: Indian person/business name
+- type: customer type (Salaried/Freelancer/Business Owner/MSME/NRI/Senior Citizen/Property Owner/Investor)
+- occupation: their job/business
+- location: area, city in India (near ${location} mostly)
+- income: estimated annual income range like "₹5-8 LPA"
+- itrForm: which ITR form they need (ITR-1/ITR-2/ITR-3/ITR-4)
+- complexity: Simple/Medium/Complex
+- suggestedCharge: realistic charge in INR as string like "₹800"
+- matchScore: 65-97
+- emoji: single relevant emoji
+- color: one of [#f5a623, #00d4aa, #ff6b2b, #4da6ff]
+- description: 2 sentences about their situation and why they need ITR help
+- painPoints: array of 2-3 short pain points
+- tags: array of 3-4 relevant tags
+- isNRI: boolean
+- isBusiness: boolean
+- contactHint: how to reach them (e.g. "Office mein milein", "WhatsApp best")
+
+Return ONLY valid JSON array, no markdown, no explanation.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] })
+    });
+    const data = await res.json();
+    const text = data.content.map(b => b.text||'').join('');
+    allCustomers = JSON.parse(text.replace(/```json|```/g,'').trim());
+  } catch(e) {
+    allCustomers = getMockCustomers(location);
+  }
+
+  clearInterval(iv);
+  steps.forEach(s => { document.getElementById(s).classList.remove('active'); document.getElementById(s).classList.add('done'); });
+  setTimeout(() => { document.getElementById('loader').classList.remove('on'); showResults(); }, 400);
+}
+
+function getMockCustomers(loc) {
+  return [
+    { id:1, name:'Ramesh Gupta', type:'Salaried', occupation:'Government Teacher', location:`Pandri, ${loc}`, income:'₹4-6 LPA', itrForm:'ITR-1', complexity:'Simple', suggestedCharge:'₹500', matchScore:95, emoji:'👨‍🏫', color:'#f5a623', description:'Sarkari teacher hai, Form 16 milta hai but khud file karna nahi aata. Har saal CA se karna chahte hain.', painPoints:['Form 16 samajh nahi aata','Deadline se darta hai','Online portal use karna nahi aata'], tags:['Salaried','ITR-1','Simple','Government'], isNRI:false, isBusiness:false, contactHint:'School ke baad milein, 4-6 PM' },
+    { id:2, name:'Priya Mehta', type:'Freelancer', occupation:'Graphic Designer', location:`Telibandha, ${loc}`, income:'₹6-10 LPA', itrForm:'ITR-4', complexity:'Medium', suggestedCharge:'₹1,200', matchScore:92, emoji:'🎨', color:'#00d4aa', description:'Freelance designer hai, multiple clients se payment aati hai. GST nahi hai but ITR-4 banana padega presumptive income ke liye.', painPoints:['Multiple income sources','TDS kata hua hai clients ne','26AS match nahi karna aata'], tags:['Freelancer','ITR-4','TDS Refund'], isNRI:false, isBusiness:false, contactHint:'Instagram ya email best hai' },
+    { id:3, name:'Sharma Kirana Store', type:'Business Owner', occupation:'Retail Shop', location:`Mowa, ${loc}`, income:'₹8-15 LPA', itrForm:'ITR-4', complexity:'Medium', suggestedCharge:'₹1,500', matchScore:88, emoji:'🏪', color:'#ff6b2b', description:'Chhota kirana store hai, GST registered hai. ITR aur GST dono chahiye. Regular client ban sakta hai.', painPoints:['GST aur ITR dono confusing','Cash vs digital income mix','Proper records nahi'],  tags:['Business','ITR-4','GST','Regular Client'], isNRI:false, isBusiness:true, contactHint:'Subah 9-11 AM ya shaam 7 ke baad' },
+    { id:4, name:'Sunita Agarwal', type:'Senior Citizen', occupation:'Retired', location:`Civil Lines, ${loc}`, income:'₹3-5 LPA', itrForm:'ITR-1', complexity:'Simple', suggestedCharge:'₹400', matchScore:85, emoji:'👵', color:'#4da6ff', description:'Retired hain, pension aur FD interest income hai. Refund milta hai but claim karna nahi aata. Bahut simple return hai.', painPoints:['Online portal samajh nahi aata','Refund claim nahi ho raha','Koi help karne wala nahi'], tags:['Senior Citizen','Pension','FD Interest','Refund'], isNRI:false, isBusiness:false, contactHint:'Ghar par milein, Hindi mein baat karein' },
+    { id:5, name:'Rahul Verma (NRI)', type:'NRI', occupation:'Software Engineer, USA', location:`Raipur Origin, ${loc}`, income:'$60,000/yr', itrForm:'ITR-2', complexity:'Complex', suggestedCharge:'₹5,000', matchScore:82, emoji:'🌍', color:'#f5a623', description:'USA mein kaam karta hai, Raipur mein property hai. NRI ITR + DTAA benefits chahiye. High value client hai.', painPoints:['India aur USA dono ki income','Property rental income','DTAA benefit ka pata nahi'], tags:['NRI','ITR-2','DTAA','High Value'], isNRI:true, isBusiness:false, contactHint:'WhatsApp/email, US time zone dhyan rakho' },
+    { id:6, name:'Anjali Beauty Salon', type:'Business Owner', occupation:'Salon Owner', location:`Shankar Nagar, ${loc}`, income:'₹5-8 LPA', itrForm:'ITR-3', complexity:'Medium', suggestedCharge:'₹1,200', matchScore:79, emoji:'💇', color:'#00d4aa', description:'Salon chalati hain, staff hai, 3-4 saal se ITR nahi bhari. Penalty se dara raha hai. Urgent help chahiye.', painPoints:['3 saal se ITR nahi bhari','Penalty ka dar','Records bilkul nahi'], tags:['Business','Salon','Penalty','Urgent'], isNRI:false, isBusiness:true, contactHint:'Salon mein jaayein, personally milein' },
+    { id:7, name:'Vikram Sahu', type:'Investor', occupation:'Stock Market Trader', location:`Avanti Vihar, ${loc}`, income:'₹10-20 LPA', itrForm:'ITR-2', complexity:'Complex', suggestedCharge:'₹3,000', matchScore:75, emoji:'📈', color:'#ff6b2b', description:'Active stock trader hai, mutual funds bhi hain. Capital gains calculate karna bahut complex ho gaya hai. LTCG/STCG dono hain.', painPoints:['LTCG STCG calculation complex','Multiple demat accounts','Crypto bhi hai'], tags:['Investor','Capital Gains','ITR-2','Complex'], isNRI:false, isBusiness:false, contactHint:'Evening mein call karein' },
+    { id:8, name:'Dr. Neha Tiwari', type:'Freelancer', occupation:'Freelance Doctor/Consultant', location:`Saddu, ${loc}`, income:'₹15-25 LPA', itrForm:'ITR-3', complexity:'Complex', suggestedCharge:'₹4,000', matchScore:70, emoji:'👩‍⚕️', color:'#4da6ff', description:'Private practice + hospital consulting dono se income hai. Professional income declare karna hai with expenses. High paying client.', painPoints:['Multiple income sources','Medical expenses deduction','Advance tax nahi bhara'], tags:['Doctor','Professional','ITR-3','High Value'], isNRI:false, isBusiness:false, contactHint:'Clinic timing ke baad, appointment lein' }
+  ];
+}
+
+function showResults() {
+  document.getElementById('results-content').style.display = 'flex';
+  renderInsight();
+  renderCards(allCustomers);
+  renderWATemplates();
+  renderAnalytics();
+}
+
+// ── INSIGHT BAR ──
+function renderInsight() {
+  const avg = Math.round(allCustomers.reduce((s,c)=>s+c.matchScore,0)/allCustomers.length);
+  const high = allCustomers.filter(c=>c.matchScore>=85).length;
+  const nri = allCustomers.filter(c=>c.isNRI).length;
+  document.getElementById('insight-bar').innerHTML = `
+    <span class="ins-lbl">AI INSIGHTS</span>
+    <div class="ins-pills">
+      <span class="ins-pill g">⚡ Avg Match: ${avg}%</span>
+      <span class="ins-pill e">🎯 ${high} Best Matches</span>
+      <span class="ins-pill">🌍 ${nri} NRI Clients</span>
+      <span class="ins-pill">👥 ${allCustomers.length} Total Found</span>
+    </div>`;
+}
+
+// ── RENDER CARDS ──
+function renderCards(list) {
+  const c = document.getElementById('cust-cards');
+  c.innerHTML = '';
+  if (!list.length) {
+    c.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">Koi match nahi</div><div class="empty-desc">Filter badlo.</div></div>';
+    return;
+  }
+  list.forEach((cu, i) => {
+    const saved = savedCustomers.find(s=>s.id===cu.id);
+    const sc = cu.matchScore >= 88 ? 's-high' : cu.matchScore >= 75 ? 's-med' : 's-low';
+    const el = document.createElement('div');
+    el.className = `cust-card fade-up ${saved?'saved':''}`;
+    el.id = `cc-${cu.id}`;
+    el.style.animationDelay = `${i*0.06}s`;
+    el.dataset.type = cu.type.toLowerCase();
+    el.dataset.nri = cu.isNRI;
+    el.dataset.biz = cu.isBusiness;
+    el.dataset.name = cu.name.toLowerCase();
+    el.innerHTML = `
+      <div class="card-top">
+        <div class="cust-avatar" style="background:${cu.color}20;color:${cu.color};border:1.5px solid ${cu.color}40;">${cu.emoji}</div>
+        <div class="card-info">
+          <div class="card-name">${cu.name}</div>
+          <div class="card-meta">
+            <span>${cu.occupation}</span>
+            <span class="mbadge">${cu.type}</span>
+            <span class="mbadge">📍 ${cu.location}</span>
+            <span class="mbadge" style="color:var(--emerald);border-color:var(--emerald)">📋 ${cu.itrForm}</span>
+            <span class="mbadge" style="color:var(--gold);border-color:var(--gold)">💰 ${cu.suggestedCharge}</span>
+          </div>
+        </div>
+        <span class="match-score ${sc}">${cu.matchScore}%</span>
+      </div>
+      <div class="card-desc">${cu.description}</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">📞 Kaise Milein: <span style="color:var(--gold)">${cu.contactHint}</span></div>
+      <div class="card-tags">${cu.tags.map(t=>`<span class="ctag">${t}</span>`).join('')}</div>
+      <div class="pain-row">${cu.painPoints.map(p=>`<span class="pain-tag">⚠️ ${p}</span>`).join('')}</div>
+      <div class="card-actions">
+        <button class="btn btn-gold btn-sm" onclick="openOutreach(${cu.id})">✉️ Message Banao</button>
+        <button class="btn btn-em btn-sm" onclick="copyInfo(${cu.id})">📋 Info Copy</button>
+        <button class="btn btn-ghost btn-sm" id="sbtn-${cu.id}" onclick="doSave(${cu.id})">${saved?'🔖 Saved':'🔖 Save'}</button>
+        <span style="margin-left:auto;font-size:11px;color:var(--text3);align-self:center;">Income: ${cu.income}</span>
+      </div>`;
+    c.appendChild(el);
+  });
+}
+
+// ── FILTER & SEARCH ──
+function doFilter(type, btn) {
+  document.querySelectorAll('.filter-bar .fbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  let f = allCustomers;
+  if (type==='high') f = allCustomers.filter(c=>c.matchScore>=85);
+  else if (type==='salaried') f = allCustomers.filter(c=>c.type.toLowerCase().includes('salaried')||c.type.toLowerCase().includes('senior'));
+  else if (type==='business') f = allCustomers.filter(c=>c.isBusiness);
+  else if (type==='nri') f = allCustomers.filter(c=>c.isNRI);
+  renderCards(f);
+}
+function doSearch(q) {
+  const v = q.toLowerCase();
+  renderCards(allCustomers.filter(c=>c.name.toLowerCase().includes(v)||c.type.toLowerCase().includes(v)||c.occupation.toLowerCase().includes(v)||c.location.toLowerCase().includes(v)));
+}
+
+// ── WA TEMPLATES ──
+function renderWATemplates() {
+  const name = document.getElementById('ca-name').value || 'Tax Service';
+  const loc = document.getElementById('location').value || 'Raipur';
+  const charge = document.getElementById('charge-slider').value;
+  const templates = [
+    { title:'🔥 Season Offer Message', body:`Namaskar! 🙏\n\nITR filing season aa gaya hai! ${new Date().getFullYear()} ki ITR aasani se file karwa lo.\n\n✅ Salaried: ₹${Math.round(charge*0.6)}\n✅ Business: ₹${charge}\n✅ Same day filing\n✅ Hindi mein puri help\n\n📍 ${loc} | 📞 [Aapka Number]\n👤 ${name}\n\nAbhi book karein! 🚀` },
+    { title:'👴 Senior Citizens ke Liye', body:`Namaskar Uncle/Aunty ji! 🙏\n\nAapki ITR filing mein help karna chahta/chahti hun.\n\n🔹 Pension income\n🔹 FD interest\n🔹 Tax refund claim\n\nSaari process main karunga/karungi, aapko kuch nahi karna. Ghar par bhi aa sakta/sakti hun.\n\nBaat karein? 📞 [Number]\n\n— ${name}, ${loc}` },
+    { title:'💼 Salaried Employees', body:`Hi! 👋\n\nAapki Form 16 hai lekin ITR file nahi ki? Deadline 31 July hai! ⏰\n\nMain ${name} hun, ${loc} se.\n💰 Sirf ₹${Math.round(charge*0.6)} mein ITR-1 filing\n⚡ 24 ghante mein done\n📄 Acknowledgment bhi milega\n\nInterested? Reply karein! 🙏` },
+    { title:'🏪 Business Owners', body:`Namaskar! 🙏\n\nAapka business hai toh ITR-3 ya ITR-4 file karna zaroori hai.\n\n✅ Business income ITR\n✅ Proper deductions claim\n✅ Penalty se bachao\n💰 ₹${charge} se shuru\n\n${name} | ${loc}\n📞 [Aapka Number]\n\nFree consultation ke liye call karein!` },
+    { title:'🌍 NRI Customers', body:`Hello! 🙏\n\nAre you an NRI with income or property in India?\n\n✅ NRI ITR Filing\n✅ DTAA Benefits\n✅ Property Income\n✅ Online process — no need to visit India\n\n${name} | ${loc}\n📧 [Email] | 📞 WhatsApp: [Number]\n\nLet's connect! 🤝` },
+    { title:'⚡ Last Minute Reminder', body:`⏰ URGENT: ITR Deadline 31 July!\n\nAb bhi ITR file nahi ki? Late filing penalty ₹5,000 tak ho sakti hai!\n\nMain ${name} hun — aaj hi contact karein.\n⚡ Emergency filing available\n📞 [Aapka Number] — ${loc}\n\nDer mat karo! 🙏` },
+  ];
+  document.getElementById('wa-templates').innerHTML = templates.map((t,i) => `
+    <div class="wa-tmpl">
+      <div class="wa-tmpl-title">${t.title}</div>
+      <div class="wa-tmpl-body" id="wtmpl-${i}">${t.body}</div>
+      <div style="display:flex;gap:7px;">
+        <button class="btn btn-wa btn-sm" onclick="copyWA(${i})">📋 Copy</button>
+        <button class="btn btn-ghost btn-sm" onclick="editWA(${i})">✏️ Edit</button>
+      </div>
+    </div>`).join('');
+}
+function copyWA(i) {
+  navigator.clipboard.writeText(document.getElementById(`wtmpl-${i}`).textContent).then(()=>showToast('WhatsApp message copy hua!','success'));
+}
+function editWA(i) {
+  const el = document.getElementById(`wtmpl-${i}`);
+  el.contentEditable = el.contentEditable === 'true' ? 'false' : 'true';
+  el.style.border = el.contentEditable === 'true' ? '1px solid var(--gold)' : 'none';
+  el.style.borderRadius = '6px';
+  el.style.padding = el.contentEditable === 'true' ? '8px' : '0';
+  if (el.contentEditable === 'true') { el.focus(); showToast('Edit mode on — changes save ho jaate hain','success'); }
+}
+
+// ── ANALYTICS ──
+function renderAnalytics() {
+  const avg = Math.round(allCustomers.reduce((s,c)=>s+c.matchScore,0)/allCustomers.length);
+  const types = {};
+  allCustomers.forEach(c=>{ types[c.type]=(types[c.type]||0)+1; });
+  document.getElementById('an-grid').innerHTML = `
+    <div class="an-card"><div class="an-val">${allCustomers.length}</div><div class="an-lbl">Total Matches</div></div>
+    <div class="an-card"><div class="an-val">${avg}%</div><div class="an-lbl">Avg Match</div></div>
+    <div class="an-card"><div class="an-val">${allCustomers.filter(c=>c.matchScore>=85).length}</div><div class="an-lbl">Best Matches</div></div>
+    <div class="an-card"><div class="an-val">${savedCustomers.length}</div><div class="an-lbl">Saved</div></div>
+    <div class="an-card"><div class="an-val">${allCustomers.filter(c=>c.isBusiness).length}</div><div class="an-lbl">Business Clients</div></div>
+    <div class="an-card"><div class="an-val">${allCustomers.filter(c=>c.isNRI).length}</div><div class="an-lbl">NRI Clients</div></div>`;
+  const sorted = Object.entries(types).sort((a,b)=>b[1]-a[1]);
+  const max = sorted[0]?.[1]||1;
+  document.getElementById('sbars').innerHTML = sorted.map(([t,n])=>`
+    <div class="sbar-row">
+      <span class="sbar-name">${t}</span>
+      <div class="sbar-track"><div class="sbar-fill" style="width:${n/max*100}%"></div></div>
+      <span class="sbar-pct">${n}</span>
+    </div>`).join('');
+}
+
+// ── OUTREACH MODAL ──
+function openOutreach(id) {
+  currentCustomer = allCustomers.find(c=>c.id===id);
+  if (!currentCustomer) return;
+  const cu = currentCustomer;
+  document.getElementById('modal-cust-info').innerHTML = `
+    <div style="width:40px;height:40px;border-radius:10px;background:${cu.color}20;color:${cu.color};border:1.5px solid ${cu.color}40;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">${cu.emoji}</div>
+    <div><div style="font-weight:700;">${cu.name}</div><div style="font-size:12px;color:var(--text2);">${cu.occupation} · ${cu.itrForm} · ${cu.suggestedCharge}</div></div>`;
+  document.getElementById('outreach-modal').classList.add('open');
+  genAllMsgs();
+}
+function closeModal() { document.getElementById('outreach-modal').classList.remove('open'); }
+document.getElementById('outreach-modal').addEventListener('click',function(e){ if(e.target===this) closeModal(); });
+
+async function genAllMsgs() {
+  ['whatsapp','email','linkedin','sms'].forEach(t=>{
+    document.getElementById(`msg-${t}`).textContent='Generating…';
+    document.getElementById(`msg-${t}`).classList.add('gen');
+  });
+  const cu = currentCustomer;
+  const name = document.getElementById('ca-name').value||'Tax Service';
+  const loc = document.getElementById('location').value||'Raipur';
+  const charge = cu.suggestedCharge;
+  const tone = currentTone;
+
+  const prompts = {
+    whatsapp: `Write a ${tone} WhatsApp message in Hindi/Hinglish (mix as per tone) from "${name}" (ITR filing service, ${loc}) to a potential client: ${cu.name}, ${cu.occupation}, needs ${cu.itrForm} filing. Their pain: ${cu.painPoints[0]}. Charge: ${charge}. Max 120 words. Use 1-2 emojis. End with CTA.`,
+    email: `Write a ${tone} cold email with Subject line from "${name}" (${loc}) to ${cu.name} for ITR filing. Their situation: ${cu.description} Pain: ${cu.painPoints.join(', ')}. Charge: ${charge}. Max 150 words. Mix Hindi-English if tone is hinglish/hindi-friendly.`,
+    linkedin: `Write a ${tone} LinkedIn connection message (max 280 chars) from "${name}" to ${cu.name} (${cu.occupation}). Mention ITR filing help. Very short.`,
+    sms: `Write a ${tone} SMS (max 160 chars) from "${name}" about ITR filing to ${cu.name}. Include deadline 31 July. Short and impactful.`
+  };
+
+  for (const t of ['whatsapp','email','linkedin','sms']) {
+    genMsg(t, prompts[t]);
+  }
+}
+
+async function genMsg(type, prompt) {
+  const el = document.getElementById(`msg-${type}`);
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': getKey(), 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, messages: [{ role:'user', content: prompt }] })
+    });
+    const data = await res.json();
+    el.textContent = data.content.map(b=>b.text||'').join('').trim();
+    el.classList.remove('gen');
+  } catch(e) {
+    el.textContent = getFallback(type);
+    el.classList.remove('gen');
+  }
+}
+
+function getFallback(type) {
+  const cu = currentCustomer;
+  const name = document.getElementById('ca-name').value||'Tax Service';
+  const loc = document.getElementById('location').value||'Raipur';
+  const fb = {
+    whatsapp: `Namaskar ${cu.name} ji! 🙏\n\nMain ${name} hun, ${loc} se. ITR filing season aa gaya hai!\n\nAapko ${cu.itrForm} file karna hai — main ${cu.suggestedCharge} mein kar deta/deti hun.\n\n⚡ Fast service\n✅ Accurate filing\n📄 Acknowledgment milega\n\nBaat karein? 😊`,
+    email: `Subject: ITR Filing Help — ${cu.itrForm} | ${name}\n\nNamaskar ${cu.name} ji,\n\nMain ${name} hun, ${loc} mein ITR filing services deta/deti hun.\n\nAapka ${cu.itrForm} filing sirf ${cu.suggestedCharge} mein ho sakta hai. Deadline 31 July hai!\n\nFree consultation ke liye reply karein.\n\n— ${name}`,
+    linkedin: `Hi ${cu.name}! I help professionals like you with ITR filing. ${cu.itrForm} filing available at ${cu.suggestedCharge}. Deadline approaching — let's connect! — ${name}`,
+    sms: `ITR Deadline: 31 July! ${cu.name} ji, ${cu.itrForm} filing sirf ${cu.suggestedCharge} mein. ${name}, ${loc}. Call: [Number]`
+  };
+  return fb[type]||'Message generate nahi hua. Dobara try karein.';
+}
+
+async function regenMsg(type) {
+  const cu = currentCustomer;
+  const name = document.getElementById('ca-name').value||'Tax Service';
+  document.getElementById(`msg-${type}`).textContent='Dobara bana raha hun…';
+  document.getElementById(`msg-${type}`).classList.add('gen');
+  await genMsg(type, `Write a different ${currentTone} ${type} message from "${name}" to ${cu.name} (${cu.occupation}) for ${cu.itrForm} ITR filing. Charge: ${cu.suggestedCharge}. Different angle. Pain: ${cu.painPoints[0]}.`);
+}
+
+function switchO(type, btn) {
+  document.querySelectorAll('.otab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.ocontent').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(`oc-${type}`).classList.add('active');
+}
+function setTone(t, btn) {
+  currentTone = t;
+  document.querySelectorAll('.tone-row .fbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  genAllMsgs();
+}
+
+// ── SAVE ──
+function doSave(id) {
+  const cu = allCustomers.find(c=>c.id===id);
+  if (!cu) return;
+  const idx = savedCustomers.findIndex(s=>s.id===id);
+  const btn = document.getElementById(`sbtn-${id}`);
+  const card = document.getElementById(`cc-${id}`);
+  if (idx===-1) {
+    savedCustomers.push(cu);
+    card?.classList.add('saved');
+    btn && (btn.textContent='🔖 Saved');
+    showToast(`${cu.name} saved!`,'success');
+  } else {
+    savedCustomers.splice(idx,1);
+    card?.classList.remove('saved');
+    btn && (btn.textContent='🔖 Save');
+    showToast('Removed from saved','');
+  }
+  document.getElementById('saved-count').textContent = savedCustomers.length;
+  renderSaved();
+  if (document.getElementById('tab-analytics').style.display!=='none') renderAnalytics();
+}
+
+function renderSaved() {
+  const c = document.getElementById('saved-cards');
+  if (!savedCustomers.length) {
+    c.innerHTML='<div class="empty-state" style="padding:36px;border:none;"><div class="empty-icon">📋</div><div class="empty-title">Koi saved nahi</div><div class="empty-desc">🔖 dabao kisi bhi customer par.</div></div>';
+    return;
+  }
+  c.innerHTML = savedCustomers.map(cu=>`
+    <div class="cust-card saved" style="padding:14px;">
+      <div class="card-top">
+        <div class="cust-avatar" style="width:38px;height:38px;font-size:16px;background:${cu.color}20;color:${cu.color};border:1.5px solid ${cu.color}40;">${cu.emoji}</div>
+        <div class="card-info">
+          <div class="card-name" style="font-size:13px;">${cu.name}</div>
+          <div class="card-meta"><span>${cu.type}</span><span class="mbadge">${cu.itrForm}</span><span class="mbadge">${cu.suggestedCharge}</span></div>
+        </div>
+        <span class="match-score ${cu.matchScore>=88?'s-high':cu.matchScore>=75?'s-med':'s-low'}">${cu.matchScore}%</span>
+      </div>
+      <div class="card-actions">
+        <button class="btn btn-gold btn-sm" onclick="openOutreach(${cu.id})">✉️ Message</button>
+        <button class="btn btn-ghost btn-sm" onclick="doSave(${cu.id})">🗑️ Remove</button>
+      </div>
+    </div>`).join('');
+}
+
+function showSaved() {
+  if (document.getElementById('results-content').style.display==='none') return;
+  switchTab('saved', document.querySelector('.tab:last-child'));
+}
+
+function copyInfo(id) {
+  const cu = allCustomers.find(c=>c.id===id);
+  if (!cu) return;
+  const text = `Naam: ${cu.name}\nKaam: ${cu.occupation}\nType: ${cu.type}\nLocation: ${cu.location}\nITR Form: ${cu.itrForm}\nIncome: ${cu.income}\nCharge: ${cu.suggestedCharge}\nMatch: ${cu.matchScore}%\nMilne ka tarika: ${cu.contactHint}`;
+  navigator.clipboard.writeText(text).then(()=>showToast('Info copy hua!','success'));
+}
+
+// ── TABS ──
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tabs .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  ['customers','whatsapp','analytics','saved'].forEach(t=>document.getElementById(`tab-${t}`).style.display='none');
+  document.getElementById(`tab-${tab}`).style.display='block';
+  if (tab==='analytics') renderAnalytics();
+  if (tab==='saved') renderSaved();
+}
+
+// ── TOAST ──
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `show ${type}`;
+  setTimeout(()=>t.className='', 3000);
+}
+
+// ── COPY / DOWNLOAD ──
+function copyMsg(id) {
+  navigator.clipboard.writeText(document.getElementById(id).textContent).then(()=>showToast('Copy hua!','success'));
+}
+function dlMsg(type) {
+  const text = document.getElementById(`msg-${type}`).textContent;
+  const a = document.createElement('a');
+  a.href = 'data:text/plain;charset=utf-8,'+encodeURIComponent(text);
+  a.download = `itr-outreach-${type}.txt`;
+  a.click();
+  showToast('Download hua!','success');
+}
+</script>
+</body>
+</html>
